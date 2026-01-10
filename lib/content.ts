@@ -39,8 +39,9 @@ function extractMetadata(content: string): PostMetadata | null {
 
     // Parse individual fields safely using regex
     const getString = (key: string): string | undefined => {
+      // Handle both single-line and multi-line values (key on one line, value on next)
       const match = objectContent.match(
-        new RegExp(`${key}:\\s*["'\`]([^"'\`]*)["'\`]`),
+        new RegExp(`${key}:\\s*["'\`]([^"'\`]*)["'\`]`, "s"),
       );
       return match ? match[1] : undefined;
     };
