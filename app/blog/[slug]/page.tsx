@@ -4,8 +4,15 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
+import { remarkCodeHike, recmaCodeHike } from "codehike/mdx";
+import { Code } from "@/components/code";
 import fs from "fs";
 import path from "path";
+
+const chConfig = {
+  components: { code: "Code" },
+};
+
 import {
   getPostMetadata,
   getAllPostSlugs,
@@ -198,7 +205,16 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* Post content */}
           <div className="prose prose-lg max-w-none">
-            <MDXRemote source={source} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+            <MDXRemote
+              source={source}
+              options={{
+                mdxOptions: {
+                  remarkPlugins: [remarkGfm, [remarkCodeHike, chConfig]],
+                  recmaPlugins: [[recmaCodeHike, chConfig]],
+                },
+              }}
+              components={{ Code }}
+            />
           </div>
         </article>
       </main>
