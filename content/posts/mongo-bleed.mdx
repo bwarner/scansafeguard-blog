@@ -57,7 +57,7 @@ To understand why this leaks sensitive data, you need to understand how heap all
 
 When you call `malloc()` or `new`, the allocator carves out a chunk of memory from the heap. When you free that memory, it goes back to the allocator's free list—but the contents aren't zeroed. The data remains until something else overwrites it.
 
-```
+```text
 HEAP MEMORY LIFECYCLE
 =====================
 
