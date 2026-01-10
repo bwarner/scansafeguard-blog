@@ -6,10 +6,7 @@ const nextConfig = {
 };
 
 const withMDX = createMDX({
-  options: {
-    remarkPlugins: [],
-    rehypePlugins: [],
-  },
+  // Don't use @mdx-js/react provider - causes RSC issues
 });
 
 export default withMDX(nextConfig);
