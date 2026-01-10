@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+/* ScanSafeguard Theme Configuration */
+@theme {
+  /* Brand fonts */
+  --font-display: var(--font-staatliches), sans-serif;
+  --font-body: var(--font-jost), sans-serif;
+
+  /* Brand colors */
+  --color-ssg-dark: #443E3E;
+  --color-ssg-light: #FCFCFC;
+  --color-ssg-brown-dark: #302D26;
+  --color-ssg-brown: #5E574B;
+  --color-ssg-gold: #F5B141;
+  --color-ssg-gold-light: #FFD18A;
+  --color-ssg-cream: #FEE9C9;
+}
+
+/* CSS Variables */
+:root {
+  --foreground: #443E3E;
+  --background: #FCFCFC;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* Prose styling for blog posts */
+.prose {
+  --tw-prose-body: #443E3E;
+  --tw-prose-headings: #302D26;
+  --tw-prose-links: #F5B141;
+  --tw-prose-bold: #302D26;
+  --tw-prose-code: #5E574B;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.025em;
+}
+
+.prose a {
+  color: #F5B141;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose a:hover {
+  color: #FFD18A;
+}
+
+.prose code {
+  background-color: #FEE9C9;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.prose pre {
+  background-color: #302D26;
+  color: #FCFCFC;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+/* Utility for balanced text */
+@utility text-balance {
+  text-wrap: balance;
+}
