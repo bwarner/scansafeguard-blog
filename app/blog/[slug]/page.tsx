@@ -2,6 +2,10 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
+import fs from "fs";
+import path from "path";
 import {
   getPostMetadata,
   getAllPostSlugs,
@@ -65,12 +69,15 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
-  // Dynamically import the MDX content
-  let Content: React.ComponentType;
+  // Read MDX content from file system
+  const filePath = path.join(process.cwd(), "content/posts", `${slug}.mdx`);
+  let source: string;
   try {
-    const mdxModule = await import(`@/content/posts/${slug}.mdx`);
-    Content = mdxModule.default;
-  } catch {
+    source = fs.readFileSync(filePath, "utf-8");
+    // Remove the metadata export from the content
+    source = source.replace(/export\s+const\s+metadata\s*=\s*\{[\s\S]*?\};/, "");
+  } catch (error) {
+    console.error(`Failed to load MDX for slug "${slug}":`, error);
     notFound();
   }
 
@@ -150,14 +157,22 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* Post header */}
           <header className="mb-8 pb-8 border-b border-[#443E3E]/10">
-            <time className="text-sm text-[#5E574B]">
-              {formatDate(metadata.date)}
-              {metadata.updated && (
-                <span className="ml-2">
-                  (Updated: {formatDate(metadata.updated)})
-                </span>
+            <div className="flex items-center gap-2 text-sm text-[#5E574B]">
+              <time>
+                {formatDate(metadata.date)}
+                {metadata.updated && (
+                  <span className="ml-2">
+                    (Updated: {formatDate(metadata.updated)})
+                  </span>
+                )}
+              </time>
+              {metadata.author && (
+                <>
+                  <span>•</span>
+                  <span>{metadata.author}</span>
+                </>
               )}
-            </time>
+            </div>
             <h1
               className="mt-4 text-4xl tracking-wide text-[#302D26]"
               style={{ fontFamily: "var(--font-display)" }}
@@ -183,7 +198,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* Post content */}
           <div className="prose prose-lg max-w-none">
-            <Content />
+            <MDXRemote source={source} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
           </div>
         </article>
       </main>
