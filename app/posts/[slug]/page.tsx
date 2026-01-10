@@ -108,9 +108,9 @@ export default async function BlogPostPage({ params }: PageProps) {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://www.scansafeguard.com/blog/${slug}`,
+      "@id": `https://www.scansafeguard.com/blog/posts/${slug}`,
     },
-    url: `https://www.scansafeguard.com/blog/${slug}`,
+    url: `https://www.scansafeguard.com/blog/posts/${slug}`,
     ...(metadata.image && { image: metadata.image }),
     ...(metadata.tags && { keywords: metadata.tags.join(", ") }),
   };
@@ -135,8 +135,14 @@ export default async function BlogPostPage({ params }: PageProps) {
       {
         "@type": "ListItem",
         position: 3,
+        name: "Posts",
+        item: "https://www.scansafeguard.com/blog/posts",
+      },
+      {
+        "@type": "ListItem",
+        position: 4,
         name: metadata.title,
-        item: `https://www.scansafeguard.com/blog/${slug}`,
+        item: `https://www.scansafeguard.com/blog/posts/${slug}`,
       },
     ],
   };
@@ -155,11 +161,11 @@ export default async function BlogPostPage({ params }: PageProps) {
         <article className="mx-auto max-w-3xl">
           {/* Back link */}
           <Link
-            href="/blog"
+            href="/posts"
             className="inline-flex items-center gap-2 text-sm text-[#5E574B] hover:text-[#F5B141] mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to blog
+            Back to posts
           </Link>
 
           {/* Post header */}

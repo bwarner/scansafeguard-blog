@@ -86,7 +86,7 @@ export default async function Home() {
 
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/blog"
+                  href="/posts"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-[#F5B141] text-[#302D26] rounded-lg hover:bg-[#FFD18A] transition-colors font-medium"
                 >
                   Read the Blog
@@ -150,7 +150,7 @@ export default async function Home() {
                 </h2>
               </div>
               <Link
-                href="/blog"
+                href="/posts"
                 className="hidden md:inline-flex items-center gap-2 text-[#5E574B] font-medium hover:text-[#F5B141] transition-colors"
               >
                 All posts
@@ -162,7 +162,7 @@ export default async function Home() {
               <div className="grid md:grid-cols-3 gap-8">
                 {recentPosts.map((post) => (
                   <article key={post.slug} className="group">
-                    <Link href={`/blog/${post.slug}`} className="block">
+                    <Link href={`/posts/${post.slug}`} className="block">
                       <div className="aspect-[16/10] bg-gradient-to-br from-[#FEE9C9] to-[#FFD18A] rounded-xl mb-5 group-hover:from-[#FFD18A] group-hover:to-[#F5B141] transition-colors flex items-center justify-center">
                         <Shield className="w-12 h-12 text-[#302D26]/20" />
                       </div>
@@ -192,7 +192,7 @@ export default async function Home() {
             )}
 
             <Link
-              href="/blog"
+              href="/posts"
               className="md:hidden inline-flex items-center gap-2 text-[#5E574B] font-medium hover:text-[#F5B141] transition-colors mt-8"
             >
               View all posts

@@ -26,6 +26,12 @@ const breadcrumbJsonLd = {
       name: "Blog",
       item: "https://www.scansafeguard.com/blog",
     },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "Posts",
+      item: "https://www.scansafeguard.com/blog/posts",
+    },
   ],
 };
 
@@ -66,7 +72,7 @@ export default async function BlogPage() {
                   key={post.slug}
                   className="group border-b border-[#443E3E]/10 pb-8 last:border-0"
                 >
-                  <Link href={`/blog/${post.slug}`} className="block">
+                  <Link href={`/posts/${post.slug}`} className="block">
                     <time className="text-sm text-[#5E574B]">
                       {formatDate(post.metadata.date)}
                     </time>
