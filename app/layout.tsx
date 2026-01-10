@@ -64,11 +64,11 @@ function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
             <Image
-              src="/logo.png"
+              src="/logo-symbol.png"
               alt="ScanSafeguard"
-              width={32}
-              height={32}
-              className="h-8 w-auto"
+              width={40}
+              height={40}
+              className="h-10 w-auto"
             />
             <span
               className="text-lg tracking-wide"
@@ -107,7 +107,7 @@ export default function RootLayout({
         )}
       >
         <Header />
-        <div className="flex-1">{children}</div>
+        {children}
         <Footer />
       </body>
     </html>
