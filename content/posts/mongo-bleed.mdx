@@ -1,0 +1,221 @@
+export const metadata = {
+  title: "MongoBleed: An 8-Year-Old Bug and What It Teaches About Memory Safety",
+  description:
+    "A technical breakdown of CVE-2025-14847, how heap memory disclosure works in C++, and why memory-safe languages like Rust prevent this class of vulnerability.",
+  date: "2026-01-09",
+  author: "Byron Warner",
+  tags: ["database-security", "vulnerability-research", "memory-safety", "mongodb", "rust"],
+  published: true,
+};
+
+# MongoBleed: An 8-Year-Old Bug and What It Teaches About Memory Safety
+
+On December 19, 2025, MongoDB disclosed CVE-2025-14847, a heap memory disclosure vulnerability that security researchers quickly dubbed "MongoBleed." The name is a nod to Heartbleed, and for good reason: both vulnerabilities share the same root cause—trusting an attacker-controlled length value without validation.
+
+What makes MongoBleed notable isn't just its severity (CVSS 8.7) or that it's being actively exploited in the wild. It's that the vulnerable code sat in production for over eight years. The commit introducing the bug landed in June 2017. It was discovered by MongoDB's own security team on December 12, 2025.
+
+Eight years. Tens of thousands of exposed instances. And a bug that a memory-safe language would have prevented entirely.
+
+## The Vulnerability
+
+MongoBleed exists in MongoDB's wire protocol compression layer. By default, MongoDB supports zlib compression for network messages—a performance optimization that reduces bandwidth between clients and servers.
+
+The flaw is in `src/mongo/transport/message_compressor_zlib.cpp`. When decompressing a message, the code returned the wrong length value:
+
+```cpp
+StatusWith<ConstDataRange> MessageCompressorZlib::decompressData(
+    ConstDataRange input,
+    DataRange output) {
+
+    z_stream stream;
+    stream.zalloc = Z_NULL;
+    stream.zfree = Z_NULL;
+    stream.opaque = Z_NULL;
+
+    stream.next_in = const_cast<Bytef*>(
+        reinterpret_cast<const Bytef*>(input.data()));
+    stream.avail_in = input.length();
+    stream.next_out = reinterpret_cast<Bytef*>(
+        const_cast<char*>(output.data()));
+    stream.avail_out = output.length();
+
+    int ret = inflate(&stream, Z_FINISH);
+
+    // BUG: Returns output.length() (allocated size) instead of 
+    // stream.total_out (actual decompressed bytes)
+    return ConstDataRange(output.data(), output.length());
+}
+```
+
+The bug is subtle. The function allocates a buffer based on the expected decompressed size from the message header, then calls zlib's `inflate()` to decompress. But when constructing the return value, it uses `output.length()`—the allocated buffer size—rather than `stream.total_out`—the actual number of bytes written.
+
+An attacker can exploit this by sending a compressed payload that decompresses to fewer bytes than declared. The server returns the full buffer, including whatever data was already sitting in that heap memory from previous operations.
+
+## How Heap Memory Disclosure Works
+
+To understand why this leaks sensitive data, you need to understand how heap allocation works in C and C++.
+
+When you call `malloc()` or `new`, the allocator carves out a chunk of memory from the heap. When you free that memory, it goes back to the allocator's free list—but the contents aren't zeroed. The data remains until something else overwrites it.
+
+```
+HEAP MEMORY LIFECYCLE
+=====================
+
+1. Application allocates buffer A for a database query result
+   ┌────────────────────────────────────────┐
+   │  { "password": "hunter2", "user": ... }│  ← sensitive data
+   └────────────────────────────────────────┘
+
+2. Buffer A is freed, returns to allocator (data NOT cleared)
+   ┌────────────────────────────────────────┐
+   │  { "password": "hunter2", "user": ... }│  ← still there
+   └────────────────────────────────────────┘
+   (now on free list)
+
+3. Attacker triggers MongoBleed, allocator reuses same region
+   ┌──────────┬─────────────────────────────┐
+   │ decomp.  │  "hunter2", "user": ... }   │
+   │ data     │  ← LEAKED to attacker       │
+   └──────────┴─────────────────────────────┘
+   (64 bytes written, 512 bytes returned)
+```
+
+MongoDB servers handle authentication, store query results, and process credentials constantly. That heap memory is a treasure trove: passwords, API keys, session tokens, query results containing PII. The attacker doesn't need to authenticate—the vulnerability is reachable before authentication in the protocol flow.
+
+The current public exploit establishes tens of thousands of connections per minute, each one potentially leaking different fragments of heap memory. Aggregate enough fragments and you can reconstruct sensitive data.
+
+## Why This Happens in C++
+
+This class of bug is endemic to C and C++. The languages give you direct memory access with minimal guardrails. A `ConstDataRange` is just a pointer and a length—there's no runtime check that the length actually corresponds to valid, initialized data.
+
+Consider what the vulnerable code is doing:
+
+```cpp
+return ConstDataRange(output.data(), output.length());
+```
+
+This constructs a view over memory. The compiler doesn't know or care whether `output.length()` bytes of meaningful data exist at that address. It trusts the programmer. And the programmer made a mistake.
+
+C++ offers tools to mitigate this—smart pointers, RAII, bounds-checked containers—but they're opt-in. The language defaults to "trust the developer," which means a single moment of inattention can introduce a vulnerability that persists for eight years.
+
+## How Rust Prevents This
+
+Rust takes a fundamentally different approach. Its ownership system and borrow checker enforce memory safety at compile time. Let's look at how equivalent code would work in Rust.
+
+In Rust, you can't accidentally return a slice that extends beyond initialized data:
+
+```rust
+fn decompress_data(input: &[u8], output: &mut [u8]) -> Result<&[u8], Error> {
+    let mut decoder = ZlibDecoder::new(input);
+    
+    // Read decompressed data into buffer
+    let bytes_written = decoder.read(output)?;
+    
+    // Return a slice of ONLY the bytes actually written
+    // This is the natural way to write it—returning more isn't possible
+    // without unsafe code
+    Ok(&output[..bytes_written])
+}
+```
+
+The key insight: Rust's slice type `&[u8]` carries its length, and that length is set when the slice is created. You can't construct a slice that claims to be 512 bytes when you only have 64 bytes of data without explicitly using `unsafe`.
+
+If you tried to return uninitialized memory, you'd have to work against the language:
+
+```rust
+// This won't compile—output might not be fully initialized
+fn broken_decompress(input: &[u8], output: &mut [u8]) -> &[u8] {
+    let mut decoder = ZlibDecoder::new(input);
+    let _ = decoder.read(output);
+    output  // Compiler allows this, but...
+}
+
+// The caller receives the full slice, BUT:
+// - Rust's standard patterns push you toward returning bytes_written
+// - Uninitialized heap memory doesn't exist in safe Rust
+// - MaybeUninit<T> makes uninitialized memory explicit and hard to misuse
+```
+
+More importantly, Rust's allocator zeros memory by default in many contexts, and the type system makes uninitialized memory explicit through `MaybeUninit<T>`. You can't accidentally hand someone a view into garbage data without the code loudly advertising that it's doing something unusual.
+
+This isn't hypothetical. The Heartbleed pattern—attacker controls length, server returns too much data—simply doesn't compile in safe Rust. You'd need `unsafe` blocks, and those are easy to audit.
+
+## Detection
+
+If you're running MongoDB, here's how to check your exposure.
+
+**Check your version:**
+
+```bash
+mongod --version
+```
+
+**Vulnerable versions:**
+
+| Branch | Vulnerable | Patched |
+|--------|-----------|---------|
+| 8.2    | 8.2.0 – 8.2.2 | 8.2.3 |
+| 8.0    | 8.0.0 – 8.0.16 | 8.0.17 |
+| 7.0    | 7.0.0 – 7.0.27 | 7.0.28 |
+| 6.0    | 6.0.0 – 6.0.26 | 6.0.27 |
+| 5.0    | 5.0.0 – 5.0.31 | 5.0.32 |
+| 4.4    | 4.4.0 – 4.4.29 | 4.4.30 |
+| 4.2 and earlier | All versions | No patch (EOL) |
+
+**Detecting exploitation attempts:**
+
+The current public exploit has a distinctive signature: it establishes massive numbers of connections (50,000–100,000+ per minute) and never sends client metadata. Legitimate MongoDB drivers always send metadata (logged as event ID 51800) immediately after connecting.
+
+Look for:
+
+- High-velocity connections from single IPs
+- Connections that skip the metadata handshake (event 22943 followed by 22944, no 51800)
+- Anomalous pre-authentication traffic patterns
+
+Eric Capuano published a [Velociraptor artifact](https://blog.ecapuano.com/p/hunting-mongobleed-cve-2025-14847) for hunting this pattern if you have Velociraptor deployed.
+
+## Mitigation
+
+**Patch immediately.** Upgrade to a fixed version. MongoDB Atlas customers are already patched.
+
+**If you can't patch right now:**
+
+Disable zlib compression:
+
+```yaml
+# mongod.conf
+net:
+  compression:
+    compressors: snappy,zstd  # Explicitly omit zlib
+```
+
+Or via command line:
+
+```bash
+mongod --networkMessageCompressors snappy,zstd
+```
+
+**For EOL versions (4.2 and earlier):**
+
+You have no patch. Disable compression entirely, restrict network access to trusted sources only, and prioritize upgrading.
+
+**Rotate secrets:**
+
+If you suspect exploitation, assume credentials and tokens in server memory may have leaked. Rotate database passwords, API keys, and session tokens.
+
+## The Bigger Picture
+
+MongoBleed isn't a failure of MongoDB specifically—it's a failure mode inherent to systems programming in memory-unsafe languages. The same pattern appears in Heartbleed, in countless buffer overflows, in use-after-free vulnerabilities.
+
+The industry is slowly moving toward memory-safe alternatives. The Linux kernel now accepts Rust code. Android and Chrome are incrementally rewriting security-critical components. Microsoft estimates 70% of their CVEs stem from memory safety issues.
+
+For defenders, the lesson is vigilance. For anyone building new infrastructure, it's worth asking: does this need to be written in C++? The performance argument weakens every year as Rust matures. The security argument for memory safety only gets stronger.
+
+## References
+
+- [CVE-2025-14847 - NVD](https://nvd.nist.gov/vuln/detail/CVE-2025-14847)
+- [MongoDB Security Update, December 2025](https://www.mongodb.com/company/blog/news/mongodb-server-security-update-december-2025)
+- [Hunting MongoBleed - Eric Capuano](https://blog.ecapuano.com/p/hunting-mongobleed-cve-2025-14847)
+- [MongoBleed PoC - joe-desimone](https://github.com/joe-desimone/mongobleed)
+- [Original commit introducing the bug (June 2017)](https://github.com/mongodb/mongo/pull/1152)
+- [Commit fixing the issue](https://github.com/mongodb/mongo/commit/505b660a14698bd2b5233bd94da3917b585c5728)
