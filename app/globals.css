@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ScanSafeguard Theme Configuration */
 @theme {
@@ -74,6 +75,36 @@ body {
   background-color: transparent;
   padding: 0;
   color: inherit;
+}
+
+/* Table enhancements */
+.prose table {
+  font-size: 0.875rem;
+}
+
+.prose thead {
+  border-bottom: 2px solid #302D26;
+}
+
+.prose th {
+  background-color: #FEE9C9;
+  color: #302D26;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+}
+
+.prose tbody tr:hover {
+  background-color: #faf9f7;
+}
+
+/* Reference list styling - last section with links */
+.prose h2:last-of-type + ul {
+  margin-top: 1.5em;
+}
+
+.prose h2:last-of-type + ul li {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
 }
 
 /* Utility for balanced text */
