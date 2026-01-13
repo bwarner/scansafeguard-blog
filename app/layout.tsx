@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description:
     "Security insights, vulnerability research, and network defense strategies. Defend your network, one scan at a time.",
   metadataBase: new URL("https://blog.scansafeguard.com"),
+  verification: {
+    google: "jij3T67e7L0fHybPJyYJ46r5_oYlLRGtuzil3jt4mEw",
+  },
 };
 
 function Header() {
