@@ -41,10 +41,19 @@ npm run build         # Production build
 npm run start         # Start production server
 npm run lint          # Run ESLint (zero warnings allowed)
 npm run lint:fix      # Auto-fix lint issues
+npm run format        # Format all files with Prettier
+npm run format:check  # Check formatting without writing
 npm run typecheck     # TypeScript type checking
 npm run test          # Run tests in watch mode
 npm run test:run      # Run tests once
 ```
+
+## Git Hooks
+
+Managed by Husky with lint-staged:
+
+- **pre-commit**: Runs ESLint and Prettier on staged files
+- **pre-push**: Runs full test suite
 
 ## Adding Blog Posts
 
