@@ -3,6 +3,7 @@ import cn from "clsx";
 import Link from "next/link";
 import Image from "next/image";
 import { staatliches, jost } from "./fonts";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -106,9 +107,11 @@ export default function RootLayout({
           "flex-col",
         )}
       >
-        <Header />
-        {children}
-        <Footer />
+        <PostHogProvider>
+          <Header />
+          {children}
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   );

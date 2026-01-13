@@ -15,6 +15,7 @@ ScanSafeguard Security Blog - a blog covering computer security topics. This is 
 - **Language**: TypeScript
 - **Testing**: Vitest + React Testing Library
 - **Linting**: ESLint
+- **Analytics**: PostHog
 - **Deployment**: Vercel
 
 ## Project Structure
@@ -68,6 +69,15 @@ description: "Brief description"
 
 Post content here...
 ```
+
+## Environment Variables
+
+Required environment variables (see `.env.example`):
+
+- `NEXT_PUBLIC_POSTHOG_KEY` - PostHog project API key
+- `NEXT_PUBLIC_POSTHOG_HOST` - PostHog API host (default: `https://us.i.posthog.com`)
+
+Set these in Vercel dashboard for production.
 
 ## Code Conventions
 
