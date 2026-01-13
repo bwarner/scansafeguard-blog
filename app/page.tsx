@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Shield, Search, Lock } from "lucide-react";
 import { getAllPosts, formatDate } from "@/lib/content";
 
@@ -165,9 +166,20 @@ export default async function Home() {
                 {recentPosts.map((post) => (
                   <article key={post.slug} className="group">
                     <Link href={`/posts/${post.slug}`} className="block">
-                      <div className="aspect-[16/10] bg-gradient-to-br from-[#FEE9C9] to-[#FFD18A] rounded-xl mb-5 group-hover:from-[#FFD18A] group-hover:to-[#F5B141] transition-colors flex items-center justify-center">
-                        <Shield className="w-12 h-12 text-[#302D26]/20" />
-                      </div>
+                      {post.metadata.image ? (
+                        <div className="aspect-[16/10] relative rounded-xl mb-5 overflow-hidden">
+                          <Image
+                            src={post.metadata.image}
+                            alt={post.metadata.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-[16/10] bg-gradient-to-br from-[#FEE9C9] to-[#FFD18A] rounded-xl mb-5 group-hover:from-[#FFD18A] group-hover:to-[#F5B141] transition-colors flex items-center justify-center">
+                          <Shield className="w-12 h-12 text-[#302D26]/20" />
+                        </div>
+                      )}
                       <time className="text-sm text-[#5E574B]">
                         {formatDate(post.metadata.date)}
                       </time>

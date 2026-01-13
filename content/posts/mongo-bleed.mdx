@@ -1,10 +1,18 @@
 export const metadata = {
-  title: "MongoBleed: An 8-Year-Old Bug and What It Teaches About Memory Safety",
+  title:
+    "MongoBleed: An 8-Year-Old Bug and What It Teaches About Memory Safety",
   description:
     "A technical breakdown of CVE-2025-14847, how heap memory disclosure works in C++, and why memory-safe languages like Rust prevent this class of vulnerability.",
   date: "2026-01-09",
   author: "Byron Warner",
-  tags: ["database-security", "vulnerability-research", "memory-safety", "mongodb", "rust"],
+  tags: [
+    "database-security",
+    "vulnerability-research",
+    "memory-safety",
+    "mongodb",
+    "rust",
+  ],
+  image: "/images/posts/mongo-bleed.png",
   published: true,
 };
 
@@ -41,7 +49,7 @@ StatusWith<ConstDataRange> MessageCompressorZlib::decompressData(
 
     int ret = inflate(&stream, Z_FINISH);
 
-    // BUG: Returns output.length() (allocated size) instead of 
+    // BUG: Returns output.length() (allocated size) instead of
     // stream.total_out (actual decompressed bytes)
     return ConstDataRange(output.data(), output.length());
 }
@@ -107,10 +115,10 @@ In Rust, you can't accidentally return a slice that extends beyond initialized d
 ```rust
 fn decompress_data(input: &[u8], output: &mut [u8]) -> Result<&[u8], Error> {
     let mut decoder = ZlibDecoder::new(input);
-    
+
     // Read decompressed data into buffer
     let bytes_written = decoder.read(output)?;
-    
+
     // Return a slice of ONLY the bytes actually written
     // This is the natural way to write it—returning more isn't possible
     // without unsafe code
@@ -152,15 +160,15 @@ mongod --version
 
 **Vulnerable versions:**
 
-| Branch | Vulnerable | Patched |
-|--------|-----------|---------|
-| 8.2    | 8.2.0 – 8.2.2 | 8.2.3 |
-| 8.0    | 8.0.0 – 8.0.16 | 8.0.17 |
-| 7.0    | 7.0.0 – 7.0.27 | 7.0.28 |
-| 6.0    | 6.0.0 – 6.0.26 | 6.0.27 |
-| 5.0    | 5.0.0 – 5.0.31 | 5.0.32 |
-| 4.4    | 4.4.0 – 4.4.29 | 4.4.30 |
-| 4.2 and earlier | All versions | No patch (EOL) |
+| Branch          | Vulnerable     | Patched        |
+| --------------- | -------------- | -------------- |
+| 8.2             | 8.2.0 – 8.2.2  | 8.2.3          |
+| 8.0             | 8.0.0 – 8.0.16 | 8.0.17         |
+| 7.0             | 7.0.0 – 7.0.27 | 7.0.28         |
+| 6.0             | 6.0.0 – 6.0.26 | 6.0.27         |
+| 5.0             | 5.0.0 – 5.0.31 | 5.0.32         |
+| 4.4             | 4.4.0 – 4.4.29 | 4.4.30         |
+| 4.2 and earlier | All versions   | No patch (EOL) |
 
 **Detecting exploitation attempts:**
 
@@ -186,7 +194,7 @@ Disable zlib compression:
 # mongod.conf
 net:
   compression:
-    compressors: snappy,zstd  # Explicitly omit zlib
+    compressors: snappy,zstd # Explicitly omit zlib
 ```
 
 Or via command line:
