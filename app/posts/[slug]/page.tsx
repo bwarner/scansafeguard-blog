@@ -82,7 +82,10 @@ export default async function BlogPostPage({ params }: PageProps) {
   try {
     source = fs.readFileSync(filePath, "utf-8");
     // Remove the metadata export from the content
-    source = source.replace(/export\s+const\s+metadata\s*=\s*\{[\s\S]*?\};/, "");
+    source = source.replace(
+      /export\s+const\s+metadata\s*=\s*\{[\s\S]*?\};/,
+      "",
+    );
   } catch (error) {
     console.error(`Failed to load MDX for slug "${slug}":`, error);
     notFound();
@@ -108,9 +111,9 @@ export default async function BlogPostPage({ params }: PageProps) {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://www.scansafeguard.com/blog/posts/${slug}`,
+      "@id": `https://blog.scansafeguard.com/posts/${slug}`,
     },
-    url: `https://www.scansafeguard.com/blog/posts/${slug}`,
+    url: `https://blog.scansafeguard.com/posts/${slug}`,
     ...(metadata.image && { image: metadata.image }),
     ...(metadata.tags && { keywords: metadata.tags.join(", ") }),
   };
@@ -130,19 +133,19 @@ export default async function BlogPostPage({ params }: PageProps) {
         "@type": "ListItem",
         position: 2,
         name: "Blog",
-        item: "https://www.scansafeguard.com/blog",
+        item: "https://blog.scansafeguard.com",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: "Posts",
-        item: "https://www.scansafeguard.com/blog/posts",
+        item: "https://blog.scansafeguard.com/posts",
       },
       {
         "@type": "ListItem",
         position: 4,
         name: metadata.title,
-        item: `https://www.scansafeguard.com/blog/posts/${slug}`,
+        item: `https://blog.scansafeguard.com/posts/${slug}`,
       },
     ],
   };

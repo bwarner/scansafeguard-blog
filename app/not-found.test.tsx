@@ -12,14 +12,14 @@ describe("NotFound", () => {
   it("renders the Page Not Found message", () => {
     render(<NotFound />);
     expect(
-      screen.getByRole("heading", { level: 2, name: /page not found/i })
+      screen.getByRole("heading", { level: 2, name: /page not found/i }),
     ).toBeInTheDocument();
   });
 
   it("renders a helpful description", () => {
     render(<NotFound />);
     expect(
-      screen.getByText(/the page you're looking for doesn't exist/i)
+      screen.getByText(/the page you're looking for doesn't exist/i),
     ).toBeInTheDocument();
   });
 
@@ -27,7 +27,7 @@ describe("NotFound", () => {
     render(<NotFound />);
     const blogLink = screen.getByRole("link", { name: /browse blog/i });
     expect(blogLink).toBeInTheDocument();
-    expect(blogLink).toHaveAttribute("href", "/blog");
+    expect(blogLink).toHaveAttribute("href", "/posts");
   });
 
   it("renders a link to go home", () => {

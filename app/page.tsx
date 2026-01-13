@@ -7,7 +7,7 @@ const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "ScanSafeguard Blog",
-  url: "https://www.scansafeguard.com/blog",
+  url: "https://blog.scansafeguard.com",
   description:
     "Security insights, vulnerability research, and network defense strategies from ScanSafeguard.",
   publisher: {
@@ -31,12 +31,14 @@ const topics = [
   {
     icon: Shield,
     title: "Vulnerability Research",
-    description: "Deep dives into CVEs, exploits, and how to defend against them.",
+    description:
+      "Deep dives into CVEs, exploits, and how to defend against them.",
   },
   {
     icon: Search,
     title: "Network Scanning",
-    description: "Best practices for discovering and assessing your attack surface.",
+    description:
+      "Best practices for discovering and assessing your attack surface.",
   },
   {
     icon: Lock,

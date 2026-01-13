@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   description:
     "Security insights, vulnerability research, and network defense strategies. Defend your network, one scan at a time.",
-  metadataBase: new URL("https://www.scansafeguard.com/blog"),
+  metadataBase: new URL("https://blog.scansafeguard.com"),
 };
 
 function Header() {
@@ -38,7 +38,7 @@ function Header() {
           </Link>
           <div className="flex items-center gap-6">
             <Link
-              href="/blog"
+              href="/posts"
               className="text-[#5E574B] hover:text-[#F5B141] transition-colors font-medium"
             >
               Blog
