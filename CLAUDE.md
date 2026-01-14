@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides context for Claude when working on this project.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -47,6 +47,7 @@ npm run format:check  # Check formatting without writing
 npm run typecheck     # TypeScript type checking
 npm run test          # Run tests in watch mode
 npm run test:run      # Run tests once
+npm run test -- app/error.test.tsx  # Run a single test file
 ```
 
 ## Git Hooks
@@ -58,17 +59,26 @@ Managed by Husky with lint-staged:
 
 ## Adding Blog Posts
 
-Create a new `.mdx` file in `content/posts/` with frontmatter:
+Create a new `.mdx` file in `content/posts/` with an exported metadata object:
 
 ```mdx
----
-title: "Post Title"
-date: "YYYY-MM-DD"
-description: "Brief description"
----
+export const metadata = {
+  title: "Post Title",
+  description: "Brief description",
+  date: "YYYY-MM-DD",
+  tags: ["tag1", "tag2"],
+  image: "/images/posts/post-name.png",
+  published: true,
+};
+
+# Post Title
 
 Post content here...
 ```
+
+Required metadata fields: `title`, `description`, `date`, `published`
+
+Optional fields: `tags`, `image`, `author`, `updated`
 
 ## Environment Variables
 
@@ -78,6 +88,12 @@ Required environment variables (see `.env.example`):
 - `NEXT_PUBLIC_POSTHOG_HOST` - PostHog API host (default: `https://us.i.posthog.com`)
 
 Set these in Vercel dashboard for production.
+
+## Architecture Notes
+
+**MDX Processing**: Posts use `next-mdx-remote/rsc` with CodeHike for syntax highlighting. The metadata export is parsed separately via regex in `lib/content.ts`, then stripped before MDX compilation.
+
+**Static Generation**: Posts are statically generated via `generateStaticParams()` in `app/posts/[slug]/page.tsx`. The `getAllPostSlugs()` function provides slugs at build time.
 
 ## Code Conventions
 
