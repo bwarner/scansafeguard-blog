@@ -14,7 +14,7 @@ const websiteJsonLd = {
   publisher: {
     "@type": "Organization",
     name: "ScanSafeguard",
-    url: "https://www.scansafeguard.com",
+    url: "https://blog.scansafeguard.com",
   },
 };
 
@@ -22,9 +22,9 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "ScanSafeguard",
-  url: "https://www.scansafeguard.com",
+  url: "https://blog.scansafeguard.com",
   description:
-    "Network security scanning and vulnerability assessment. Defend your network, one scan at a time.",
+    "Security insights, vulnerability research, and network defense strategies.",
   sameAs: [],
 };
 
@@ -95,14 +95,6 @@ export default async function Home() {
                   Read the Blog
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a
-                  href="https://www.scansafeguard.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#443E3E] text-[#443E3E] rounded-lg hover:bg-[#443E3E] hover:text-white transition-colors font-medium"
-                >
-                  Start Scanning
-                </a>
               </div>
             </div>
           </div>
@@ -212,31 +204,6 @@ export default async function Home() {
               View all posts
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="py-24 px-6 bg-gradient-to-br from-[#302D26] to-[#5E574B] text-white">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2
-              className="text-3xl md:text-5xl tracking-wide mb-6"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              READY TO SECURE YOUR NETWORK?
-            </h2>
-            <p className="text-xl text-[#FFD18A] mb-10 max-w-xl mx-auto">
-              Start scanning for vulnerabilities today with ScanSafeguard. Know
-              your attack surface before attackers do.
-            </p>
-            <a
-              href="https://www.scansafeguard.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#F5B141] text-[#302D26] rounded-lg hover:bg-[#FFD18A] transition-colors font-medium text-lg"
-            >
-              Get Started Free
-              <ArrowRight className="w-5 h-5" />
-            </a>
           </div>
         </section>
       </main>

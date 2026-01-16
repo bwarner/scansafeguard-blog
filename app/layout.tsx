@@ -46,14 +46,6 @@ function Header() {
             >
               Blog
             </Link>
-            <a
-              href="https://www.scansafeguard.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-[#F5B141] text-[#302D26] rounded-lg hover:bg-[#FFD18A] transition-colors font-medium"
-            >
-              Get Started
-            </a>
           </div>
         </nav>
       </div>

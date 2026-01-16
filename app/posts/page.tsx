@@ -18,17 +18,11 @@ const breadcrumbJsonLd = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://www.scansafeguard.com",
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Blog",
       item: "https://blog.scansafeguard.com",
     },
     {
       "@type": "ListItem",
-      position: 3,
+      position: 2,
       name: "Posts",
       item: "https://blog.scansafeguard.com/posts",
     },

@@ -102,12 +102,12 @@ export default async function BlogPostPage({ params }: PageProps) {
     author: {
       "@type": "Organization",
       name: "ScanSafeguard",
-      url: "https://www.scansafeguard.com",
+      url: "https://blog.scansafeguard.com",
     },
     publisher: {
       "@type": "Organization",
       name: "ScanSafeguard",
-      url: "https://www.scansafeguard.com",
+      url: "https://blog.scansafeguard.com",
     },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -127,23 +127,17 @@ export default async function BlogPostPage({ params }: PageProps) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://www.scansafeguard.com",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Blog",
         item: "https://blog.scansafeguard.com",
       },
       {
         "@type": "ListItem",
-        position: 3,
+        position: 2,
         name: "Posts",
         item: "https://blog.scansafeguard.com/posts",
       },
       {
         "@type": "ListItem",
-        position: 4,
+        position: 3,
         name: metadata.title,
         item: `https://blog.scansafeguard.com/posts/${slug}`,
       },
